@@ -1,0 +1,63 @@
+
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style></style>
+  </head>
+    <body>
+       <h2>User information</h2>
+       <table class="table" id="user-info">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Username</th>
+            <th scope="col">Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="username"></td>
+            <td id="email"></td>
+          </tr>
+        </tbody>
+      </table>
+
+
+<h2>Subject information</h2>
+<table class="table" id="subject-info">
+  <thead class="thead-dark">
+  <tr>
+    <th>Subject</th>
+    <th>Pass mark</th>
+    <th>Mark obtained</th>
+  </tr>
+  </thead>
+  <!-- Add subjects here dynamically -->
+</table> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script>
+    $.ajax({
+  type: "GET",
+  url: "get-user-info.php",
+  success: function(data) {
+    var userInfo = JSON.parse(data);
+    
+      $("#user-info").append("<tr><td>" + userInfo.user[0].username + "</td><td>" + userInfo.user[0].email + "</td><td></td></tr>");
+  }
+});
+
+$.ajax({
+  type: "GET",
+  url: "get-subject-info.php",
+  success: function(data) {
+    var subjectInfo = JSON.parse(data);
+    var mark="";
+    for (var i = 0; i < subjectInfo.length; i++) {
+      mark=subjectInfo[i].mark;
+      if(subjectInfo[i].mark==null){mark="";}
+      $("#subject-info").append("<tr><td>" + subjectInfo[i].name + "</td><td>" + subjectInfo[i].passMark + "</td><td>" + mark + "</td></tr>");
+    }
+  }
+});
+</script>
+    </body>
+</html>

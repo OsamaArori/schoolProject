@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <script src="https://kit.fontawesome.com/cb354ecbca.js" crossorigin="anonymous"></script>
+          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+          <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+      <style></style>
+    </head>
+      <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <a class="navbar-brand" href="#">Admin dashboard</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item active">
+                <button class="btn btn-outline-success my-2 my-sm-0" id="create-student-btn">Create New User</button>
+              </li>
+              <li class="nav-item">
+                <button class="btn btn-outline-success my-2 my-sm-0" id="create-subject-btn">Create New Subject</button>
+              </li>
+              <li class="nav-item dropdown">
+                <button class="btn btn-outline-success my-2 my-sm-0" id="assign-subject-btn">Assign Subject</button>
+              </li>
+              <li class="nav-item">
+                <button class="btn btn-outline-success my-2 my-sm-0" id="set-mark-btn">Set Mark</button>
+              </li>
+              <li class="nav-item">
+                <button class="btn btn-outline-success my-2 my-sm-0" id="chat">Chat</button>
+              </li>
+            </ul>
+            
+              
+              <button class="btn btn-danger my-2 my-sm-0" onclick="logout()" type="submit">Logout</button>
+            
+          </div>
+        </nav>
+         <h2>Student information</h2>
+         <table class="table" id="user-info">
+            <thead class="thead-dark">
+            <tr>
+              <th>username</th>
+              <th>email</th>
+              <th>isActive</th>
+              <th>edit</th>
+              <th>delete</th>
+              
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+            
+          </table> 
+          <!-- edit Modal    --------------------------------                    -->
+          <div id="edit-modal" class="modal">
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <form id="edit-form">
+                <input type="hidden" id="student-id">
+                <div>
+                  <label for="username">Username:</label>
+                  <input type="text" id="username1">
+                </div>
+                <div>
+                  <label for="email">Email:</label>
+                  <input type="email" id="email1">
+                </div>
+                <div>
+                  <label for="active">Active:</label>
+                  <input type="checkbox" id="active1" >
+                </div>
+                <button type="submit" id="save">Save</button>
+              </form>
+            </div>
+          </div>
+          
+          <!-- Delete Modal ----------------------------------------------->
+          <div id="delete-modal" class="modal">
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <p>Are you sure you want to delete this student?</p>
+              <button id="confirm-delete-btn">Yes</button>
+              <button id="cancel-delete-btn">No</button>
+            </div>
+          </div>
+          <!-- Create Student Modal --------------------------------------->
+          <div id="create-student-modal" class="modal">
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <form id="create-user-form">
+                <div>
+                  <label for="username">Username:</label>
+                  <input type="text" id="username2">
+                </div>
+                <div>
+                  <label for="email">Email:</label>
+                  <input type="email" id="email2">
+                </div>
+                <div>
+                  <label for="password">Password:</label>
+                  <input type="text" id="password2">
+                  </div>
+                  <button type="submit">Save</button>
+                  </form>
+                  
+                    </div>
+                  </div>
+                  <!-- Create Subject Modal -------------------------------------------->
+                  <div id="create-subject-modal" class="modal">
+                    <div class="modal-content">
+                      <span class="close">&times;</span>
+                      <form id="create-subject-form">
+                        <div>
+                          <label for="subject-name">Subject Name:</label>
+                          <input type="text" id="subject-name">
+                        </div>
+                        <div>
+                          <label for="min-mark">Minimum Mark for Success:</label>
+                          <input type="number" id="min-mark">
+                        </div>
+                        <button type="submit">Save</button>
+                      </form>
+                    </div>
+                  </div>
+
+                  <!-- Assign Subject Modal ----------------------------------------->
+                  <div id="assign-subject-modal" style="display: none;">
+                    <form id="assign-subject-form">
+                      <select id="assign-subject-id">
+                      
+                        
+                      </select>
+                      <select id="assign-student-id">
+                        
+                      </select>
+                      <input type="submit" value="Assign">
+                    </form>
+                  </div>
+                 <!--  Modal for setting mark ------------------------------------------->
+                  <div id="set-mark-modal" class="modal">
+                    <div class="modal-content">
+                      <form id="set-mark-form">
+                        <label>Student:</label>
+                        <select id="set-mark-student-id" name="student_id">
+                        </select>
+                        <label>Subject:</label>
+                        <select id="set-mark-subject-id" name="subject_id">
+                        </select>
+                        <label>Mark:</label>
+                        <input type="number" id="mark" name="mark">
+                        <input type="submit" value="Set" class="btn btn-outline-success my-2 my-sm-0">
+                      </form>
+                    </div>
+                  </div>
+       
+  <script>
+
+      $.ajax({
+    type: "GET",
+    url: "get-user-info.php",
+    success: function(data) {
+      var userInfo = JSON.parse(data);
+    //    for (var i = 0; i < userInfo.allusers.length; i++) {
+    //     $("#assign-student-id").append("<option value='"+userInfo.allusers[i].id+"'>"+userInfo.allusers[i].username+"</option>");
+    //  }
+     const table = document.getElementsByTagName("tbody")[0];
+                    let str = ""
+                    userInfo.allusers.forEach(row => {
+                        str += `<tr>
+                              <td><p id='uname' value='${row.username}'>${row.username}</p></td>
+                              <td><p id='uemail' value='${row.email}'>${row.email}</p></td>
+                              <td><p id='uactive' value='${row.isactive}'>${row.isactive}</p></td>
+                              <td><button type="button" id='ed' value="${row.id}" class='edit-btn btn btn-outline-success my-2 my-sm-0'">Edit</button></td>
+                              <td><button type="button" id='del' value="${row.id}" class='delete-btn btn btn-outline-danger my-2 my-sm-0'">Delete</button></td>
+                              </tr>`;
+                    });
+                    table.innerHTML = str;
+                    
+}
+
+  });
+  
+
+  $.ajax({
+  url: "usersForAssign.php",
+    type: "GET",
+    data:{id:1},
+    success: function(data) {
+      console.log();
+      var users = JSON.parse(data);
+      console.log(data);
+      for (var i = 0; i < users.length; i++) {
+        $("#assign-student-id").append("<option value='"+users[i].id+"'>"+users[i].username+"</option>");
+      }
+    }
+  });
+
+  $("#assign-subject-id").on('change', function() {
+  $("#assign-student-id").empty();
+$.ajax({
+  url: "usersForAssign.php",
+    type: "GET",
+    data:{id:$(this).val()},
+    success: function(data) {
+      console.log(data);
+      var users = JSON.parse(data);
+  //     if(users.length==0){
+  //       console.log("length");
+  //       $.ajax({
+  // url: "getAllUsers.php",
+  //   type: "GET",
+  //   success: function(data) {
+  //     console.log("hello");
+  //     var users = JSON.parse(data);
+  //     console.log(data);
+  //     for (var i = 0; i < users.length; i++) {
+  //       $("#assign-student-id").append("<option value='"+users[i].id+"'>"+users[i].username+"</option>");
+  //     }
+  //   }
+  // });
+  //     }
+      console.log(data);
+      for (var i = 0; i < users.length; i++) {
+        $("#assign-student-id").append("<option value='"+users[i].id+"'>"+users[i].username+"</option>");
+      }
+    }
+  });
+});
+
+  $.ajax({
+    type: "GET",
+    url: "getAllSubject.php",
+    success: function(data) {
+      var subjectInfo = JSON.parse(data);
+      for (var j = 0; j < subjectInfo.length; j++) {
+        console.log("sub");
+        $("#assign-subject-id").append("<option value='"+subjectInfo[j].id+"'>"+subjectInfo[j].name+"</option>");
+      }
+    }
+  });
+  /////////////////////////////////////delete later on
+  $.ajax({
+    type: "GET",
+    url: "get-subject-info.php",
+    success: function(data) {
+      var subjectInfo = JSON.parse(data);
+      console.log(subjectInfo);
+      for (var i = 0; i < subjectInfo.length; i++) {
+        $("#subject-info").append("<tr><td>" + subjectInfo[i].name + "</td><td>" + subjectInfo[i].passMark + "</td><td></td></tr>");
+      }
+      for (var i = 0; i < subjectInfo.length; i++) {
+        
+        $("#set-mark-subject-id").append("<option value='"+subjectInfo[i].id+"'>"+subjectInfo[i].name+"</option>");
+      }
+    }
+  });
+  ////////////////////////////////////////////
+  var stdId="";
+  var uname="";
+  var email=";"
+  $('#ed').ready(function() {
+  // show/hide modals
+  $('.edit-btn').click(function() {
+    $('#edit-modal').show();
+    var studentId = $(this).val();
+    stdId=studentId;
+    $.ajax({
+  type: "GET",
+  data:{id:studentId},
+  url: "getUser.php",
+  success: function(data) {
+    var userInfo1 = JSON.parse(data);
+    $('#username1').val(userInfo1.user[0].username);
+    $('#email1').val(userInfo1.user[0].email);
+  }
+});
+    
+
+    console.log($(this).val());
+  });
+  $('#chat').click(function() {
+  location.replace("chat.html");
+  });
+  $('.delete-btn').click(function() {
+    $('#delete-modal').show();
+    var studentId = $(this).val();
+    $('#confirm-delete-btn').click(function() {
+      $.ajax({
+        url: 'adminAction.php',
+        type: 'post',
+        data: {
+          action: 'delete_student',
+          student_id: studentId
+        },
+        success: function(response) {
+          
+          location.reload();
+}
+});
+});
+$('#cancel-delete-btn').click(function() {$('#delete-modal').hide();});
+});
+
+$('#create-student-btn').click(function() {
+$('#create-student-modal').show();
+});
+
+$('#create-subject-btn').click(function() {
+$('#create-subject-modal').show();
+});
+
+$('.close').click(function() {
+$(this).parent().hide();
+});
+
+// submit forms
+$('#edit-form').submit(function(e) {
+e.preventDefault();
+var isactive;
+if($('#active1').is(':checked')){
+isactive="active";
+}else{isactive="inactive"}
+$.ajax({
+url: 'adminAction.php',
+type: 'post',
+data: {
+action: 'update_student',
+student_id: stdId,
+username: $('#username1').val(),
+email: $('#email1').val(),
+active: isactive
+},
+success: function(response) {
+   location.reload();
+  console.log("ooooooooooooooooooooooooo"+response);
+  console.log(isactive);
+  console.log($('#active1').is(':checked'));
+}
+});
+});
+
+$('#create-user-form').submit(function(e) {
+e.preventDefault();
+$.ajax({
+url: 'adminAction.php',
+type: 'post',
+data: {
+action: 'create_student',
+username: $('#username2').val(),
+email: $('#email2').val(),
+password: $('#password2').val()
+},
+success: function(response) {
+  
+  location.reload();
+}
+});
+});
+
+$('#create-subject-form').submit(function(e) {
+e.preventDefault();
+$.ajax({
+url: 'adminAction.php',
+type: 'post',
+data: {
+action: 'create_subject',
+subject_name: $('#subject-name').val(),
+min_mark: $('#min-mark').val()
+},
+success: function(response) {
+
+}
+});
+});
+
+$('#assign-subject-btn').click(function() {
+  $('#assign-subject-modal').show();
+});
+
+$('#assign-subject-form').submit(function(e) {
+  e.preventDefault();
+  $.ajax({
+    url: 'adminAction.php',
+    type: 'post',
+    data: {
+      action: 'assign_subject',
+      studentId: $('#assign-student-id').val(),
+      subjectId: $('#assign-subject-id').val()
+    },
+    success: function(response) {
+      location.reload();
+      
+    }
+  });
+});
+
+
+$('#set-mark-btn').click(function() {
+    $('#set-mark-modal').show();
+  });
+
+  
+    $.ajax({
+      url: 'get-user-info.php',
+    type: 'get',
+    success: function(response) {
+      console.log("change");
+      var userInfo = JSON.parse(response);
+      for (var i = 0; i < userInfo.allusers.length; i++) {
+        $("#set-mark-student-id").append("<option value='"+userInfo.allusers[i].id+"'>"+userInfo.allusers[i].username+"</option>");
+     }
+     $.ajax({
+  url: "getUserSubject.php",
+    type: "GET",
+    data:{studentId:$("#set-mark-student-id").val()},
+    success: function(data) {
+      console.log(data);
+      var subjectInfo = JSON.parse(data);
+      console.log(data);
+      for (var i = 0; i < subjectInfo.length; i++) {
+        $("#set-mark-subject-id").append("<option value='"+subjectInfo[i].id+"'>"+subjectInfo[i].name+"</option>");
+      }
+    }
+  });
+    }
+    
+ 
+  });
+  
+$("#set-mark-student-id").on('change', function() {
+  $("#set-mark-subject-id").empty();
+$.ajax({
+  url: "getUserSubject.php",
+    type: "GET",
+    data:{studentId:$("#set-mark-student-id").val()},
+    success: function(data) {
+      console.log(data);
+      var subjectInfo = JSON.parse(data);
+      console.log(data);
+      // $("#mark").val();
+      for (var i = 0; i < subjectInfo.length; i++) {
+        
+        $("#set-mark-subject-id").append("<option value='"+subjectInfo[i].id+"'>"+subjectInfo[i].name+"</option>");
+      }
+    }
+  });
+});
+///////////////////////////////////////
+
+$.ajax({
+  url: "getUserSubject.php",
+    type: "GET",
+    data:{studentId:$("#set-mark-student-id").val()},
+    success: function(data) {
+      console.log(data);
+      var subjectInfo = JSON.parse(data);
+      console.log(data);
+      for (var i = 0; i < subjectInfo.length; i++) {
+        
+        $("#set-mark-subject-id").append("<option value='"+subjectInfo[i].id+"'>"+subjectInfo[i].name+"</option>");
+      }
+    }
+  });
+  
+
+// hide set mark modal when form is submitted
+$('#set-mark-form').submit(function(event) {
+  event.preventDefault();
+  $.ajax({
+    url: 'adminAction.php',
+    type: 'post',
+    data: {
+      action:'set_mark',
+      studentId: $('#set-mark-student-id').val(),
+      subjectId: $('#set-mark-subject-id').val(),
+      mark: $('#set-mark-form input[name="mark"]').val()
+    },
+    success: function(response) {
+      $('#set-mark-modal').hide();
+    }
+  });
+});
+});
+function logout(){
+            $.ajax({
+                url: "logout.php",
+                type: "GET",
+                dataType: "json",
+                success: function (result) {
+                    if(result == 1){
+                        location.replace("index.html");
+                    }else{
+                        alert("error");
+                    }
+                },
+            });
+        }
+        
+  </script>
+      </body>
+  </html>
+  
